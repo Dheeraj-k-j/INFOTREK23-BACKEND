@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const catchAsync = require("../utils/catchAsync");
+const { use } = require("../routes/userRoutes");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -14,6 +15,11 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, "Please provide valid email"],
+  },
+  role: {
+    type: String,
+    enum: ["user", "admin", "member"],
+    default: "user"
   },
   password: {
     type: String,
@@ -38,7 +44,10 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.methods.checkPassword = async function(providedPassword, actualPassword){
+userSchema.methods.checkPassword = async function (
+  providedPassword,
+  actualPassword
+) {
   return await bcrypt.compare(providedPassword, actualPassword);
 };
 
@@ -54,6 +63,11 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
+
+userSchema.methods.changedPasswordAfterJWT = function (JWTiat) {
+  const lastUpdateTime = this.createdAt.getDate();
+  return JWTiat < lastUpdateTime;
+};
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

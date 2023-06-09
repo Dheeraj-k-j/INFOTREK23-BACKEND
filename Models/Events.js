@@ -5,6 +5,9 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: [true, "Name is required for the Event"],
   },
+  tagline: {
+    type: String,
+  },
   description: {
     type: String,
     required: [true, "Description is required for the Event"],
@@ -17,12 +20,6 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  // organizers: [
-  //   {
-  //     type: Schema.User.ObjectId,
-  //     ref: "User",
-  //   },
-  // ],
   thumbnail: {
     type: String,
     required: true,

@@ -2,6 +2,7 @@ const User = require("../Models/User");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const jwt = require("jsonwebtoken");
+const { promisify } = require("util");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_KEY, {
@@ -56,3 +57,40 @@ exports.login = catchAsync(async (req, res, next) => {
     token,
   });
 });
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // console.log(req.headers);
+  // 1. Check whether JWT exist or not.
+  if (
+    !req.headers.authorization ||
+    !req.headers.authorization.startsWith("Bearer")
+  ) {
+    return next(new AppError("You are not logged in!", 401));
+  }
+
+  const token = req.headers.authorization.split(" ")[1];
+  console.log(token);
+
+  // 2. Validate the token.(Validation, Expiration, User Existance and password change)
+  // Error handled by the global error handling middleware.
+  const decode = await promisify(jwt.verify)(token, process.env.JWT_KEY);
+
+  const freshUser = await User.findById(decode.id);
+  if (!freshUser)
+    return next(new AppError("User no longer exist. Sign up again!", 401));
+  if (freshUser.changedPasswordAfterJWT(decode.iat))
+    return next(new AppError("Token Expired! Log in again.", 401));
+
+  req.user = freshUser;
+  next();
+});
+
+exports.restrictTo = (...roles) => {
+  return (req, res, err) => {
+    if (!roles.includes(req.user.role))
+      return next(
+        new AppError("You don't have permission to perform this action!", 403)
+      );
+    next();
+  };
+};

@@ -8,18 +8,21 @@ const {
     createEvent,
     updateEvent,
     deleteEvent,
+    checkEventBody,
   } = require("../controllers/eventController");
+const { protect } = require('../controllers/authController');
 
 // router.param('id', checkId); //Middleware to validate id it'll run whenerver there is a event url request with the id
+
 router
     .route("/")
     .get(getAllEvents)
-    .post(createEvent);
+    .post(protect, restrictTo("admin", "member"), checkEventBody, createEvent);
 
 router
     .route("/:id")
     .get(getEvent)
-    .patch(updateEvent)
-    .delete(deleteEvent);
+    .patch(protect, restrictTo("admin", "member"), updateEvent)
+    .delete(protect, restrictTo("admin", "member"), deleteEvent);
 
 module.exports = router;

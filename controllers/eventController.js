@@ -1,6 +1,6 @@
 const Event = require("../Models/Events");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError")
+const AppError = require("../utils/appError");
 
 // exports.checkId = (req, res, next, val) => {
 //   // Write code to check param id here for event
@@ -38,13 +38,13 @@ exports.updateEvent = catchAsync(async (req, res, next) => {});
 
 exports.deleteEvent = catchAsync(async (req, res, next) => {});
 
-// exports.checkEventBody = (req, res, next) => {
-//   console.log(req.body);
-//   if (!req.body.name || !req.body.email || !req.body.password){
-//     return res.status(400).json({
-//       status: "Failed",
-//       message: "Fill all fields completely in the form!"
-//     });
-//   }
-//   next();
-// };
+exports.checkEventBody = (req, res, next) => {
+  console.log(req.body);
+  if (!req.body.name || !req.body.description || !req.body.date || !req.body.location){
+    return res.status(400).json({
+      status: "Failed",
+      message: "Fill all fields completely in the form!"
+    });
+  }
+  next();
+};

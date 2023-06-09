@@ -39,8 +39,8 @@ exports.updateUser = catchAsync(async (req, res, next) => {});
 exports.deleteUser = catchAsync(async (req, res, next) => {});
 
 exports.checkUserBody = (req, res, next) => {
-  console.log(req.body);
-  if (!req.body.name || !req.body.email || !req.body.password){
+  // console.log(req.body);
+  if (!req.body.name || !req.body.email || !req.body.password || !req.body.confirmPassword){
     return res.status(400).json({
       status: "Failed",
       message: "Fill all fields completely in the form!"
