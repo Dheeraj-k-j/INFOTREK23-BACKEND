@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const eventSchema = new mongoose.Schema({
   name: {
     type: String,
+    unique: true,
     required: [true, "Name is required for the Event"],
   },
   tagline: {
@@ -22,7 +23,6 @@ const eventSchema = new mongoose.Schema({
   },
   thumbnail: {
     type: String,
-    required: true,
   },
 });
 

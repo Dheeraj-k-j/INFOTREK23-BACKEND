@@ -3,7 +3,10 @@ const router = express.Router();
 
 const {
     signup,
-    login
+    login,
+    protect,
+    forgotPassword,
+    resetPassword
 } = require("../controllers/authController");
 
 const {
@@ -13,13 +16,16 @@ const {
     getUser,
     createUser,
     updateUser,
-    deleteUser,
+    deleteUser
   } = require("../controllers/userController");
 
 // router.param('id', checkId); //Middleware to validate id it'll run whenerver there is a event url request with the id
 
-router.post("/signup", checkUserBody,signup);
+router.post("/signup", checkUserBody, signup);
 router.post("/login", login);
+router.post("/forgotPassword", forgotPassword);
+router.patch("/resetPassword/:token", resetPassword);
+// router.post("/resetPassword", resetPassword);
 
 router
     .route("/")

@@ -32,14 +32,22 @@ exports.getEvent = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createEvent = catchAsync(async (req, res, next) => {});
+exports.createEvent = catchAsync(async (req, res, next) => {
+  const newEvent = await Event.create(req.body);
+  res.status(201).json({
+    status: "success",
+    data: {
+      newEvent
+    }
+  })
+});
+
 
 exports.updateEvent = catchAsync(async (req, res, next) => {});
-
 exports.deleteEvent = catchAsync(async (req, res, next) => {});
 
 exports.checkEventBody = (req, res, next) => {
-  console.log(req.body);
+  // console.log(req.body);
   if (!req.body.name || !req.body.description || !req.body.date || !req.body.location){
     return res.status(400).json({
       status: "Failed",

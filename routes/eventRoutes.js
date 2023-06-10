@@ -10,7 +10,11 @@ const {
     deleteEvent,
     checkEventBody,
   } = require("../controllers/eventController");
-const { protect } = require('../controllers/authController');
+
+const {
+    protect,
+    restrictTo
+  } = require('../controllers/authController');
 
 // router.param('id', checkId); //Middleware to validate id it'll run whenerver there is a event url request with the id
 

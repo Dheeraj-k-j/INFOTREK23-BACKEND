@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const catchAsync = require("../utils/catchAsync");
 const { use } = require("../routes/userRoutes");
 
@@ -19,7 +20,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["user", "admin", "member"],
-    default: "user"
+    default: "user",
   },
   password: {
     type: String,
@@ -42,7 +43,12 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetTokenExpiresAt: Date,
 });
+
+// Instance methods of usser model
 
 userSchema.methods.checkPassword = async function (
   providedPassword,
@@ -54,19 +60,29 @@ userSchema.methods.checkPassword = async function (
 userSchema.pre("save", async function (next) {
   // Returns if password is not modified
   if (!this.isModified("password")) return next();
-
   // Hashing the password with random salt and cost of 12
   this.password = await bcrypt.hash(this.password, 12);
-
   // Don't need confirmPassword in DB
   this.confirmPassword = undefined;
-
+  this.passwordChangedAt = Date.now()-1000;
   next();
 });
 
 userSchema.methods.changedPasswordAfterJWT = function (JWTiat) {
-  const lastUpdateTime = this.createdAt.getDate();
+  const lastUpdateTime = this.passwordChangedAt.getDate();
   return JWTiat < lastUpdateTime;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.passwordResetTokenExpiresAt = Date.now() + 600000;
+
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);
