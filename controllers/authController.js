@@ -12,6 +12,25 @@ const signToken = (id) => {
   });
 };
 
+const createAndSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  const cookieOptions = {
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60000),
+    httpOnly: true,
+  };
+  if (process.env.NODE_ENV === "production") cookieOptions.secure = ture;
+
+  res.cookie("jwt", token, cookieOptions);
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   // console.log(req.body);
   const newUser = await User.create({
@@ -20,16 +39,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
   });
-
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: "success",
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  
+  createAndSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -53,16 +64,12 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError("Incorrect Password!", 401));
   }
 
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createAndSendToken(user, 200, res);
 });
 
-
 exports.forgotPassword = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
+  // const userQuery = ;
+  const user = await User.findOne({ email: req.body.email }).exec();
   if (!user) return next(new AppError("No user exist with this email!", 403));
 
   const resetToken = user.createPasswordResetToken();
@@ -71,11 +78,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   const resetUrl = `${req.protocol}://${req.get(
     "host"
-  )}/users/forgotPassword/${resetToken}`;
+  )}/users/resetPassword/${resetToken}`;
 
   try {
     await sendEmail({
-      email: user.email,
+      email: req.body.email,
       subject: "Your reset password token is valid for 10 minutes.",
       message: `This mail is from INFOTREK-ACM. Change your password by visiting the following link. ${resetUrl} If you didn't request this email please ignore it.`,
     });
@@ -97,7 +104,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.resetPassword = catchAsync( async (req, res, next) => {
+exports.resetPassword = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
     .update(req.params.token)
@@ -105,23 +112,35 @@ exports.resetPassword = catchAsync( async (req, res, next) => {
 
   const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetTokenExpiresAt: {$gt: Date.now()}
+    passwordResetTokenExpiresAt: { $gt: Date.now() },
   });
 
-  if(!user)
-    return next(new AppError("Either token is invalid or expired!",500))
+  if (!user)
+    return next(new AppError("Either token is invalid or expired!", 500));
 
-  user.password=req.body.password;
-  user.confirmPassword=req.body.password;
-  user.resetToken = undefined;
+  user.password = req.body.password;
+  user.confirmPassword = req.body.password;
+  user.passwordResetToken = undefined;
   user.passwordResetTokenExpiresAt = undefined;
   await user.save();
 
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createAndSendToken(user, 200, res);
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select("+password");
+  const oldPassword = req.body.oldPassword;
+
+  const userIsValid = await user.checkPassword(oldPassword, user.password);
+  if (!userIsValid) {
+    return next(new AppError("Incorrect Password!", 401));
+  }
+
+  user.password = req.body.newPassword;
+  user.confirmPassword = req.body.confirmNewPassword;
+  await user.save();
+
+  createAndSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {

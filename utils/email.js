@@ -1,14 +1,14 @@
 const nodemailer = require("nodemailer");
 const catchAsync = require("./catchAsync");
 
-const sendEmail = catchAsync(async (options) => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
+const sendEmail = catchAsync( async (options) => {
+  const transport = nodemailer.createTransport({
+    host: "sandbox.smtp.mailtrap.io",
+    port: 2525,
     auth: {
-      user: process.env.EMAIL_USERNMAE,
-      pass: process.env.EMAIL_PASS,
-    },
+      user: "d0f69334083983",
+      pass: "019857864d2268"
+    }
   });
 
   const mailOptions = {
@@ -18,7 +18,7 @@ const sendEmail = catchAsync(async (options) => {
     text: options.message,
   };
 
-  await transporter.sendMail(mailOptions);
+  await transport.sendMail(mailOptions);
 });
 
-exports.module = sendEmail;
+module.exports = sendEmail;
