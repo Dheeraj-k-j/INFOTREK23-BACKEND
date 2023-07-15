@@ -42,7 +42,6 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   })
 });
 
-
 exports.updateEvent = catchAsync(async (req, res, next) => {});
 exports.deleteEvent = catchAsync(async (req, res, next) => {});
 

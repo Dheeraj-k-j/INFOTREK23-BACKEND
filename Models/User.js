@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
+const Event = require("./Events");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
@@ -6,6 +8,7 @@ const catchAsync = require("../utils/catchAsync");
 const { use } = require("../routes/userRoutes");
 
 const userSchema = new mongoose.Schema({
+  _id: Schema.Types.ObjectId,
   name: {
     type: String,
     required: [true, "A user must have some name"],
@@ -22,6 +25,10 @@ const userSchema = new mongoose.Schema({
     enum: ["user", "admin", "member"],
     default: "user",
   },
+  registeredEvent: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event',
+  }],
   password: {
     type: String,
     required: true,

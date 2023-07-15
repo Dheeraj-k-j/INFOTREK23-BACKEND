@@ -7,7 +7,8 @@ const {
     protect,
     forgotPassword,
     resetPassword,
-    updatePassword
+    updatePassword,
+    restrictTo
 } = require("../controllers/authController");
 
 const {
@@ -17,7 +18,8 @@ const {
     getUser,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser, 
+    register
   } = require("../controllers/userController");
 
 // router.param('id', checkId); //Middleware to validate id it'll run whenerver there is a event url request with the id
@@ -27,16 +29,18 @@ router.post("/login", login);
 router.post("/forgotPassword", forgotPassword);
 router.patch("/resetPassword/:token", resetPassword);
 router.patch("/updatePassword/", protect, updatePassword);
+router.get("/mydata", protect, getUser);
 // router.post("/resetPassword", resetPassword);
 
 router
     .route("/")
-    .get(protect, getAllUsers)
-    .post(protect, createUser);
+    .get(protect, restrictTo("admin", "member"), getAllUsers)
+    .post(protect, restrictTo("admin", "member"), createUser);
 
 router
     .route("/:id")
     .get(protect, getUser)
+    .post(protect, register)
     .patch(protect, updateUser)
     .delete(protect, deleteUser);
 

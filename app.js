@@ -9,6 +9,7 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const cors = require('cors');
 
 
 // Local Imports
@@ -45,6 +46,9 @@ app.use(mongoSanitize());
 
 // XSS Protection
 app.use(xss());
+
+// Enable CORS for all routes
+app.use(cors());
 
 
 // -----------------    ROUTE HANDLING (API ENDPOINTS)   ----------------------------
