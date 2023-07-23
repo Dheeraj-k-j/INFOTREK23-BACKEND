@@ -8,7 +8,6 @@ const catchAsync = require("../utils/catchAsync");
 const { use } = require("../routes/userRoutes");
 
 const userSchema = new mongoose.Schema({
-  _id: Schema.Types.ObjectId,
   name: {
     type: String,
     required: [true, "A user must have some name"],

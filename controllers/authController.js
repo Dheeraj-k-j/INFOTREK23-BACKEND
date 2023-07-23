@@ -84,7 +84,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     await sendEmail({
       email: req.body.email,
       subject: "Your reset password token is valid for 10 minutes.",
-      message: `This mail is from INFOTREK-ACM. Change your password by visiting the following link. ${resetUrl} If you didn't request this email please ignore it.`,
+      message: `This mail is from INFOTREK-ACM. Change your password by entering the following token during reset password -"${resetToken}" , If you didn't request this email please ignore it.`,
     });
 
     res.status(200).json({
