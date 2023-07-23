@@ -47,7 +47,7 @@ exports.deleteEvent = catchAsync(async (req, res, next) => {});
 
 exports.checkEventBody = (req, res, next) => {
   // console.log(req.body);
-  if (!req.body.name || !req.body.description || !req.body.date || !req.body.location){
+  if (!req.body.name || !req.body.description){
     return res.status(400).json({
       status: "Failed",
       message: "Fill all fields completely in the form!"
