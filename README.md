@@ -14,10 +14,10 @@ Infotrek is an event management Web Application designed to streamline event org
 
 Infotrek is utilized by over 500 students of NIT Trichy during events conducted by ACM NITT. To get started with Infotrek:
 
-1. Clone the repository: `git clone https://github.com/ImJoshiANE/INFOTREK23-FRONTEND.git`
+1. Clone the repository: `git clone https://github.com/ImJoshiANE/INFOTREK23-BACKEND.git`
 2. Install dependencies: `npm install`
 3. Start the server: `npm start`
-4. Access Infotrek in your browser at `http://localhost:3000`
+4. Make API calls at `http://localhost:8080`
 
 ## Technology Stack
 
