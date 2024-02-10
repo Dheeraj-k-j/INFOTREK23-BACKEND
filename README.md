@@ -31,6 +31,4 @@ Infotrek is utilized by over 500 students of NIT Trichy during events conducted 
 
 ## Contributors
 
-- Overall [Dheeraj Kumar](https://github.com/ImJoshiANE)
-- Team Page [Piyush Singh](https://github.com/pewpiyu)
-- Event Page [Abhiusnees](https://github.com/Abhiusnees)
+- [Dheeraj Kumar](https://github.com/ImJoshiANE)
